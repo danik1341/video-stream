@@ -5,7 +5,7 @@ import {
   type DefaultSession,
   type NextAuthOptions,
 } from "next-auth";
-import DiscordProvider from "next-auth/providers/discord";
+import EmailProvider from "next-auth/providers/email";
 
 import { env } from "~/env.mjs";
 import { db } from "~/server/db";
@@ -48,9 +48,16 @@ export const authOptions: NextAuthOptions = {
   },
   adapter: PrismaAdapter(db),
   providers: [
-    DiscordProvider({
-      clientId: env.DISCORD_CLIENT_ID,
-      clientSecret: env.DISCORD_CLIENT_SECRET,
+    EmailProvider({
+      server: {
+        host: env.EMAIL_SERVER_HOST,
+        port: env.EMAIL_SERVER_PORT,
+        auth: {
+          user: env.EMAIL_SERVER_USER,
+          pass: env.EMAIL_SERVER_PASSWORD,
+        },
+      },
+      from: env.EMAIL_FROM,
     }),
     /**
      * ...add more providers here.
@@ -62,6 +69,12 @@ export const authOptions: NextAuthOptions = {
      * @see https://next-auth.js.org/providers/github
      */
   ],
+  theme: {
+    colorScheme: "auto", // "auto" | "dark" | "light"
+    brandColor: "", // Hex color code
+    logo: "", // Absolute URL to image
+    buttonText: "", // Hex color code
+  },
 };
 
 /**
