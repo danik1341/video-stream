@@ -47,23 +47,24 @@ model Session {
 }
 
 model User {
-  id                     String                   @id @default(cuid())
-  name                   String?
-  email                  String?                  @unique
-  emailVerified          DateTime?
-  image                  String?
-  backgroundImage        String?                  @db.Text
-  handle                 String?                  @unique
-  videos                 Video[]
-  VideoEngagement        VideoEngagements[]
-  Comment                Comment[]
-  accounts               Account[]
-  sessions               Session[]
-  Announcement           Announcement[]
-  AnnouncementEngagement AnnouncementEngagement[]
-  followers              FollowEngagement[]       @relation("Followers")
-  followings             FollowEngagement[]       @relation("Following")
-  Playlist               Playlist[]
+  id                      String                   @id @default(cuid())
+  name                    String?
+  email                   String                   @unique
+  emailVerified           DateTime?
+  image                   String?                  @db.Text
+  backgroundImage         String?                  @db.Text
+  handle                  String?                  @unique
+  description             String?                  @db.Text
+  videos                  Video[]
+  videoEngagements        VideoEngagement[]
+  playlists               Playlist[]
+  announcements           Announcement[]
+  announcementEngagements AnnouncementEngagement[]
+  followers               FollowEngagement[]       @relation("Following")
+  followings              FollowEngagement[]       @relation("Followers")
+  comments                Comment[]
+  accounts                Account[]
+  sessions                Session[]
 }
 
 model Video {
@@ -76,14 +77,14 @@ model Video {
   userId           String
   createdAt        DateTime           @updatedAt
   user             User               @relation(fields: [userId], references: [id], onDelete: Cascade)
-  VideoEngagement  VideoEngagements[]
+  VideoEngagements VideoEngagement[]
   Comment          Comment[]
   PlaylistHasVideo PlaylistHasVideo[]
 
   @@index([userId])
 }
 
-model VideoEngagements {
+model VideoEngagement {
   id             String         @id @default(cuid())
   userId         String?
   videoId        String?
@@ -112,13 +113,13 @@ model Comment {
 }
 
 model Announcement {
-  id                     String                   @id @default(cuid())
-  message                String                   @db.Text
-  userId                 String
-  createdAt              DateTime                 @default(now())
-  updatedAt              DateTime                 @updatedAt
-  user                   User                     @relation(fields: [userId], references: [id], onDelete: Cascade)
-  AnnouncementEngagement AnnouncementEngagement[]
+  id                      String                   @id @default(cuid())
+  message                 String                   @db.Text
+  userId                  String
+  createdAt               DateTime                 @default(now())
+  updatedAt               DateTime                 @updatedAt
+  user                    User                     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  announcementEngagements AnnouncementEngagement[]
 
   @@index([userId])
 }
@@ -133,8 +134,8 @@ model AnnouncementEngagement {
   announcement   Announcement   @relation(fields: [announcementId], references: [id], onDelete: Cascade)
 
   @@id([userId, announcementId])
-  @@index([userId])
   @@index([announcementId])
+  @@index([userId])
 }
 
 model FollowEngagement {
@@ -165,14 +166,15 @@ model Playlist {
 }
 
 model PlaylistHasVideo {
-  id       String    @id @default(cuid())
-  playerId String
-  videoId  String
-  playlist Playlist? @relation(fields: [playerId], references: [id], onDelete: Cascade)
-  video    Video?    @relation(fields: [videoId], references: [id], onDelete: Cascade)
+  id         String    @id @default(cuid())
+  videoId    String
+  playlistId String
+  playlist   Playlist? @relation(fields: [playlistId], references: [id], onDelete: Cascade)
+  video      Video?    @relation(fields: [videoId], references: [id], onDelete: Cascade)
 
+  @@index([playlistId, videoId])
+  @@index([playlistId])
   @@index([videoId])
-  @@index([playerId])
 }
 
 model VerificationToken {

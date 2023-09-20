@@ -2,7 +2,7 @@ import {
   PrismaClient,
   type User,
   type Video,
-  type VideoEngagements,
+  type VideoEngagement,
   type FollowEngagement,
   type Announcement,
   type AnnouncementEngagement,
@@ -15,7 +15,7 @@ import path from "path";
 
 const prisma = new PrismaClient();
 
-const userFile = path.join(__dirname, "data/users.json");
+const userFile = path.join(__dirname, "data/user.json");
 const users: User[] = JSON.parse(fs.readFileSync(userFile, "utf8")) as User[];
 
 const videoFile = path.join(__dirname, "data/video.json");
@@ -24,9 +24,9 @@ const videos: Video[] = JSON.parse(
 ) as Video[];
 
 const videoEngagementsFile = path.join(__dirname, "data/videoEngagement.json");
-const videoEngagements: VideoEngagements[] = JSON.parse(
+const videoEngagements: VideoEngagement[] = JSON.parse(
   fs.readFileSync(videoEngagementsFile, "utf-8"),
-) as VideoEngagements[];
+) as VideoEngagement[];
 
 const followEngagementsFile = path.join(
   __dirname,
@@ -95,7 +95,7 @@ const cloudinaryName = process.env.NEXT_PUBLIC_CLOUDINARY_NAME ?? "";
 async function main() {
   await prisma.user.deleteMany();
   await prisma.video.deleteMany();
-  await prisma.videoEngagements.deleteMany();
+  await prisma.videoEngagement.deleteMany();
   await prisma.followEngagement.deleteMany();
   await prisma.announcement.deleteMany();
   await prisma.announcementEngagement.deleteMany();
@@ -103,8 +103,8 @@ async function main() {
   await prisma.playlist.deleteMany();
   await prisma.playlistHasVideo.deleteMany();
 
-  await processInChunks(users, 10, async (user) => {
-    await prisma.user.upsert({
+  await processInChunks(users, 10, (user) =>
+    prisma.user.upsert({
       where: { id: user.id },
       update: {
         ...user,
@@ -130,11 +130,11 @@ async function main() {
           ? `https://res.cloudinary.com/${cloudinaryName}${user.backgroundImage}`
           : null,
       },
-    });
-  });
+    }),
+  );
 
-  await processInChunks(videos, 10, async (video) => {
-    await prisma.video.upsert({
+  await processInChunks(videos, 10, (video) =>
+    prisma.video.upsert({
       where: { id: video.id },
       update: {
         ...video,
@@ -148,12 +148,12 @@ async function main() {
         thumbnailUrl: `https://res.cloudinary.com/${cloudinaryName}${video.thumbnailUrl}`,
         videoUrl: `https://res.cloudinary.com/${cloudinaryName}${video.videoUrl}`,
       },
-    });
-  });
+    }),
+  );
 
-  await processInChunks(videoEngagements, 10, async (videoEngagement) => {
-    await prisma.videoEngagements.create({ data: videoEngagement });
-  });
+  await processInChunks(videoEngagements, 10, (videoEngagement) =>
+    prisma.videoEngagement.create({ data: videoEngagement }),
+  );
 
   await processInChunks(followEngagements, 10, async (followEngagement) => {
     const existingFollowEngagements = await prisma.followEngagement.findMany({
@@ -169,16 +169,13 @@ async function main() {
     }
   });
 
-  await processInChunks(
-    announcements,
-    10,
-    async (announcement) =>
-      await prisma.announcement.create({ data: announcement }),
+  await processInChunks(announcements, 10, (announcement) =>
+    prisma.announcement.create({ data: announcement }),
   );
 
   await processInChunks(
     announcementEngagements,
-    10,
+    1,
     async (announcementEngagement) => {
       const existingAnnouncementEngagements =
         await prisma.announcementEngagement.findMany({
@@ -199,60 +196,46 @@ async function main() {
       }
     },
   );
-
-  await processInChunks(
-    comments,
-    10,
-    async (comment) =>
-      await prisma.comment.upsert({
-        where: { id: comment.id },
-        update: {
-          ...comment,
-          videoId: getNextVideoId(),
-          userId: getNextUserId(),
-          createdAt: comment.createdAt
-            ? new Date(comment.createdAt)
-            : undefined,
-        },
-        create: {
-          ...comment,
-          userId: getNextUserId(),
-          videoId: getNextVideoId(),
-          createdAt: comment.createdAt
-            ? new Date(comment.createdAt)
-            : undefined,
-        },
-      }),
+  await processInChunks(comments, 10, (comment) =>
+    prisma.comment.upsert({
+      where: { id: comment.id },
+      update: {
+        ...comment,
+        videoId: getNextVideoId(),
+        userId: getNextUserId(),
+        createdAt: comment.createdAt ? new Date(comment.createdAt) : undefined,
+      },
+      create: {
+        ...comment,
+        userId: getNextUserId(),
+        videoId: getNextVideoId(),
+        createdAt: comment.createdAt ? new Date(comment.createdAt) : undefined,
+      },
+    }),
   );
 
-  await processInChunks(
-    playlists,
-    10,
-    async (playlist) =>
-      await prisma.playlist.upsert({
-        where: { id: playlist.id },
-        update: {
-          ...playlist,
-          userId: getNextUserId(),
-          createdAt: playlist.createdAt
-            ? new Date(playlist.createdAt)
-            : undefined,
-        },
-        create: {
-          ...playlist,
-          userId: getNextUserId(),
-          createdAt: playlist.createdAt
-            ? new Date(playlist.createdAt)
-            : undefined,
-        },
-      }),
+  await processInChunks(playlists, 10, async (playlist) =>
+    prisma.playlist.upsert({
+      where: { id: playlist.id },
+      update: {
+        ...playlist,
+        userId: getNextUserId(),
+        createdAt: playlist.createdAt
+          ? new Date(playlist.createdAt)
+          : undefined,
+      },
+      create: {
+        ...playlist,
+        userId: getNextUserId(),
+        createdAt: playlist.createdAt
+          ? new Date(playlist.createdAt)
+          : undefined,
+      },
+    }),
   );
 
-  await processInChunks(
-    playlistHasVideos,
-    10,
-    async (playlistHasVideo) =>
-      await prisma.playlistHasVideo.create({ data: playlistHasVideo }),
+  await processInChunks(playlistHasVideos, 10, (playlistHasVideo) =>
+    prisma.playlistHasVideo.create({ data: playlistHasVideo }),
   );
 }
 
