@@ -209,7 +209,7 @@ export default function Navbar({ children }: NavbarProps) {
                   {sessionData ? (
                     <div className=" mx-4 my-2 flex">
                       <UserImage image={sessionData?.user.image ?? ""} />
-                      <div className="ml-2 flex w-full flex-col justify-start truncate">
+                      <div className="ml-2 flex w-3/4 flex-col justify-start truncate">
                         <p className=" truncate text-sm font-semibold text-gray-700">
                           {sessionData && <span>{sessionData.user?.name}</span>}
                         </p>
