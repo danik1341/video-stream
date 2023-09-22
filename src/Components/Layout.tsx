@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import { Navbar, Sidebar } from "./Components";
+import { Footer, Navbar, Sidebar } from "./Components";
 import Menu from "./Icons/Menu";
 
 interface LayoutProps {
@@ -29,7 +29,17 @@ export default function Layout({ children, closeSidebar }: LayoutProps) {
         closeSidebar={closeSidebar}
         setSidebarOpen={setSidebarOpen}
       />
-      <div className=" space-x-4">{children}</div>
+      <div className=" lg:hidden">
+        <Footer />
+      </div>
+
+      <div className={classNames(closeSidebar ? "lg:pl-20" : "lg:pl-56")}>
+        <main className="py-24">
+          <div className=" mx-auto px-4 sm:px-6 lg:px-8">
+            <div className=" space-x-4">{children}</div>
+          </div>
+        </main>
+      </div>
     </>
   );
 }
