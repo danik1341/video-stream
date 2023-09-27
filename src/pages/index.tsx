@@ -1,13 +1,36 @@
+import { type NextPage } from "next";
 import { signIn, signOut, useSession } from "next-auth/react";
 import Head from "next/head";
 import Link from "next/link";
 import Button from "~/Components/Buttons/Button";
-import { Navbar, Sidebar, Layout } from "~/Components/Components";
+import {
+  ErrorMessage,
+  Layout,
+  LoadingSkeleton,
+  MultiColumnVideo,
+} from "~/Components/Components";
 
 import { api } from "~/utils/api";
 
-export default function Home() {
+const Home: NextPage = () => {
   // const hello = api.example.hello.useQuery({ text: "from tRPC" });
+  const { data, isLoading, error } = api.video.getRandomVideos.useQuery(40);
+
+  const Error = () => {
+    if (isLoading) {
+      return <LoadingSkeleton count={40} />;
+    } else if (error ?? !data) {
+      return (
+        <ErrorMessage
+          icon="GreenPlay"
+          message="No Videos"
+          description="Sorry no videos were found."
+        />
+      );
+    } else {
+      return <></>;
+    }
+  };
 
   return (
     <>
@@ -16,12 +39,30 @@ export default function Home() {
         <meta name="description" content="Video Streaming At VidChill" />
         <link rel="icon" href="/favicon.ico" />
       </Head>
-      {/* <Navbar /> */}
-      {/* <Sidebar /> */}
+
       <Layout>
-        <p>This is form home page</p>
+        {!data || error ? (
+          <Error />
+        ) : (
+          <>
+            <MultiColumnVideo
+              videos={data.videos.map((video) => ({
+                id: video?.id ?? "",
+                title: video?.title ?? "",
+                thumbnailUrl: video?.thumbnailUrl ?? "",
+                createdAt: video?.createdAt ?? new Date(),
+                views: video?.views ?? 0,
+              }))}
+              users={data.users.map((user) => ({
+                name: user?.name ?? "",
+                image: user?.image ?? "",
+              }))}
+            />
+          </>
+        )}
       </Layout>
-      <h1>Hello world</h1>
     </>
   );
-}
+};
+
+export default Home;
