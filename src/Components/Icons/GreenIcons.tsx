@@ -12,9 +12,9 @@ export function GreenPlay(props: React.SVGProps<SVGSVGElement>) {
       <path
         d="M24.8333 24.8212C24.8333 23.6882 24.8333 23.1217 25.0696 22.8094C25.2754 22.5374 25.5899 22.369 25.9304 22.3487C26.3213 22.3253 26.7927 22.6396 27.7354 23.2681L40.0036 31.4468C40.7825 31.9662 41.172 32.2258 41.3077 32.5531C41.4264 32.8392 41.4264 33.1608 41.3077 33.4469C41.172 33.7742 40.7825 34.0339 40.0036 34.5532L27.7354 42.7319C26.7927 43.3604 26.3213 43.6747 25.9304 43.6513C25.5899 43.631 25.2754 43.4626 25.0696 43.1906C24.8333 42.8783 24.8333 42.3118 24.8333 41.1788V24.8212Z"
         stroke="#11999E"
-        stroke-width="2"
-        stroke-linecap="round"
-        stroke-linejoin="round"
+        strokeWidth="2"
+        strokeLinecap="round"
+        strokeLinejoin="round"
       />
       <rect
         x="5"
@@ -23,7 +23,7 @@ export function GreenPlay(props: React.SVGProps<SVGSVGElement>) {
         height="56"
         rx="28"
         stroke="#F0FDF9"
-        stroke-width="10"
+        strokeWidth="10"
       />
     </svg>
   );
