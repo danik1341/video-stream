@@ -1,6 +1,5 @@
 import {
   type PrismaClient,
-  type Prisma,
   type User,
   type Video,
   EngagementType,
@@ -127,5 +126,109 @@ export const videoRouter = createTRPCRouter({
       );
 
       return { videos: videosWithCounts, users: users };
+    }),
+
+  getVideoById: publicProcedure
+    .input(
+      z.object({
+        id: z.string(),
+        viewerId: z.string().optional(),
+      }),
+    )
+    .query(async ({ ctx, input }) => {
+      const rawVideo = await ctx.db.video.findUnique({
+        where: {
+          id: input.id,
+        },
+        include: {
+          user: true,
+          comments: {
+            include: {
+              user: true,
+            },
+          },
+        },
+      });
+
+      if (!rawVideo) {
+        throw new Error("Video not found");
+      }
+
+      const { user, comments, ...video } = rawVideo;
+
+      const followers = await ctx.db.followEngagement.count({
+        where: {
+          followerId: video.userId,
+        },
+      });
+      const likes = await ctx.db.videoEngagement.count({
+        where: {
+          videoId: video.id,
+          engagementType: EngagementType.LIKE,
+        },
+      });
+      const dislikes = await ctx.db.videoEngagement.count({
+        where: {
+          videoId: video.id,
+          engagementType: EngagementType.DISLIKE,
+        },
+      });
+      const views = await ctx.db.videoEngagement.count({
+        where: {
+          videoId: video.id,
+          engagementType: EngagementType.VIEW,
+        },
+      });
+
+      const userWithFollowers = { ...user, followers };
+      const videoWithLikesDislikesViews = { ...video, likes, dislikes, views };
+      const commentsWithUsers = comments.map(({ user, ...comment }) => ({
+        user,
+        comment,
+      }));
+
+      let viewerHasLiked = false;
+      let viewerHasDisliked = false;
+      let viewerHasFollowed = false;
+
+      if (input.viewerId && input.viewerId !== "") {
+        viewerHasLiked = !!(await ctx.db.videoEngagement.findFirst({
+          where: {
+            videoId: input.id,
+            userId: input.viewerId,
+            engagementType: EngagementType.LIKE,
+          },
+        }));
+
+        viewerHasDisliked = !!(await ctx.db.videoEngagement.findFirst({
+          where: {
+            videoId: input.id,
+            userId: input.viewerId,
+            engagementType: EngagementType.DISLIKE,
+          },
+        }));
+
+        viewerHasFollowed = !!(await ctx.db.followEngagement.findFirst({
+          where: {
+            followingId: rawVideo.userId,
+            followerId: input.viewerId,
+          },
+        }));
+      } else {
+        viewerHasLiked = false;
+        viewerHasDisliked = false;
+        viewerHasFollowed = false;
+      }
+      const viewer = {
+        hasLiked: viewerHasLiked,
+        hasDisliked: viewerHasDisliked,
+        hasFollowed: viewerHasFollowed,
+      };
+      return {
+        video: videoWithLikesDislikesViews,
+        user: userWithFollowers,
+        comments: commentsWithUsers,
+        viewer,
+      };
     }),
 });
