@@ -156,11 +156,11 @@ model FollowEngagement {
 model Playlist {
   id               String             @id @default(cuid())
   title            String             @db.Text
-  description      String             @db.Text
+  description      String?            @db.Text
   userId           String
   createdAt        DateTime           @default(now())
   updatedAt        DateTime           @updatedAt
-  user             User               @relation(fields: [userId], references: [id], onDelete: Cascade)
+  user             User?              @relation(fields: [userId], references: [id], onDelete: Cascade)
   PlaylistHasVideo PlaylistHasVideo[]
 
   @@index([userId])
