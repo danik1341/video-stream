@@ -9,7 +9,6 @@ import {
   LoadingSkeleton,
   MultiColumnVideo,
 } from "~/Components/Components";
-
 import { api } from "~/utils/api";
 
 const Home: NextPage = () => {
