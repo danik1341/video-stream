@@ -20,7 +20,8 @@ const SearchPage: NextPage = () => {
   const Error = () => {
     if (isLoading) {
       return <LoadingSkeleton count={40} />;
-    } else if (error ?? !data) {
+      // eslint-disable-next-line @typescript-eslint/prefer-nullish-coalescing
+    } else if (error || !data || data.videos.length === 0) {
       return (
         <ErrorMessage
           icon="GreenPlay"
@@ -42,7 +43,7 @@ const SearchPage: NextPage = () => {
       </Head>
 
       <Layout>
-        {!data || error ? (
+        {!data || data.videos.length === 0 || error ? (
           <Error />
         ) : (
           <>
