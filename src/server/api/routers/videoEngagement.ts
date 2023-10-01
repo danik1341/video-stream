@@ -70,7 +70,7 @@ export const videoEngagementRouter = createTRPCRouter({
       if (input.userId && input.userId !== "") {
         const playlist = await getOrCreatePlaylist(
           ctx,
-          "Default",
+          "History",
           input.userId,
         );
         await ctx.db.playlistHasVideo.create({
