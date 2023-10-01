@@ -20,6 +20,7 @@ import ReactPlayer from "react-player";
 import Link from "next/link";
 import FollowButton from "~/Components/Buttons/FollowButton";
 import LikeDislikeButton from "~/Components/Buttons/LikeDislikeButton";
+import SaveButton from "~/Components/Buttons/SaveButton";
 
 const VideoPage: NextPage = () => {
   const router = useRouter();
@@ -146,6 +147,7 @@ const VideoPage: NextPage = () => {
                             hasDisliked: viewer!.hasDisliked,
                           }}
                         />
+                        <SaveButton videoId={video.id} />
                       </div>
                     </div>
                     <div className="flex flex-row place-content-between gap-x-4">
