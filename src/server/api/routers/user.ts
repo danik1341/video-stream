@@ -38,4 +38,50 @@ export const userRouter = createTRPCRouter({
         return follow;
       }
     }),
+
+  getChannelById: publicProcedure
+    .input(
+      z.object({
+        id: z.string(),
+        viewerId: z.string().optional(),
+      }),
+    )
+    .query(async ({ ctx, input }) => {
+      const user = await ctx.db.user.findUnique({
+        where: {
+          id: input.id,
+        },
+      });
+      if (!user) {
+        throw new Error("User not found");
+      }
+
+      const followers = await ctx.db.followEngagement.count({
+        where: {
+          followingId: user.id,
+        },
+      });
+
+      const following = await ctx.db.followEngagement.count({
+        where: {
+          followerId: user.id,
+        },
+      });
+      let viewerHasFollowed = false;
+      const userWithEngagements = { ...user, followers, following };
+
+      if (input.viewerId && input.viewerId !== "") {
+        viewerHasFollowed = !!(await ctx.db.followEngagement.findFirst({
+          where: {
+            followingId: user.id,
+            followerId: input.viewerId,
+          },
+        }));
+      }
+      const viewer = {
+        hasFollowed: viewerHasFollowed,
+      };
+
+      return { user: userWithEngagements, viewer };
+    }),
 });
