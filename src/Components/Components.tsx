@@ -6,6 +6,8 @@ export { default as Thumbnail } from "./Thumbnail";
 export { LoadingSkeleton, ErrorMessage } from "./ErrorMessage";
 export { default as Description } from "./Description";
 export { default as CommentSection } from "./CommentSection";
+export { default as ProfileHeader } from "./ProfileHeader";
+export { MultiColumnPlaylist, SinglePlaylist } from "./PlaylistComponent";
 export {
   UserImage,
   UserName,
