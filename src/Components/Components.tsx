@@ -8,6 +8,7 @@ export { default as Description } from "./Description";
 export { default as CommentSection } from "./CommentSection";
 export { default as ProfileHeader } from "./ProfileHeader";
 export { MultiColumnPlaylist, SinglePlaylist } from "./PlaylistComponent";
+export { Content } from "./Content";
 export {
   UserImage,
   UserName,
