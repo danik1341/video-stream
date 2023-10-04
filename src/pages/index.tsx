@@ -1,8 +1,5 @@
 import { type NextPage } from "next";
-import { signIn, signOut, useSession } from "next-auth/react";
 import Head from "next/head";
-import Link from "next/link";
-import Button from "~/Components/Buttons/Button";
 import {
   ErrorMessage,
   Layout,
@@ -12,7 +9,6 @@ import {
 import { api } from "~/utils/api";
 
 const Home: NextPage = () => {
-  // const hello = api.example.hello.useQuery({ text: "from tRPC" });
   const { data, isLoading, error } = api.video.getRandomVideos.useQuery(40);
 
   const Error = () => {
