@@ -25,7 +25,7 @@ const ProfileFollowing: NextPage = () => {
 
   const Error = () => {
     if (isLoading) {
-      return <LoadingSkeleton count={1} />;
+      return <LoadingSkeleton count={10} />;
     } else if (userId == sessionData?.user.id && errorTypes) {
       return (
         <ErrorMessage

@@ -1,7 +1,11 @@
 import { useSession } from "next-auth/react";
 import { useRouter } from "next/router";
 import { api } from "~/utils/api";
-import { LoadingSkeleton, ErrorMessage } from "./ErrorMessage";
+import {
+  LoadingSkeleton,
+  ErrorMessage,
+  ProfileHeaderLoading,
+} from "./ErrorMessage";
 import Head from "next/head";
 import Image from "next/image";
 import { UserImage } from "./Components";
@@ -31,7 +35,7 @@ export default function ProfileHeader() {
 
   const Error = () => {
     if (isLoading) {
-      return <LoadingSkeleton count={1} />;
+      return <ProfileHeaderLoading />;
     } else if (errorTypes) {
       return (
         <ErrorMessage

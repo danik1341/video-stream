@@ -261,7 +261,11 @@ const Settings: NextPage = () => {
                   >
                     Save
                   </Button>
-                  {userWasUpdated && <span>Saved!</span>}
+                  {userWasUpdated && (
+                    <span className=" font-semibold text-primary-700">
+                      Saved!
+                    </span>
+                  )}
                 </div>
               </form>
             </div>

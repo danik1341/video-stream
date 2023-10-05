@@ -7,13 +7,15 @@ import {
   SmallSingleColumnVideo,
   Layout,
   ErrorMessage,
-  LoadingSkeleton,
   VideoTitle,
   VideoInfo,
   UserImage,
   UserName,
   Description,
   CommentSection,
+  LoadingSmallSideColumnVideos,
+  CommentSectionLoading,
+  VideoPlayerLoading,
 } from "~/Components/Components";
 import { api } from "~/utils/api";
 import ReactPlayer from "react-player";
@@ -79,7 +81,14 @@ const VideoPage: NextPage = () => {
 
   const DataError = () => {
     if (videoLoading) {
-      return <LoadingSkeleton count={1} />;
+      return (
+        <>
+          <div className="w-full sm:px-4 lg:w-3/5">
+            <VideoPlayerLoading />
+            <CommentSectionLoading count={10} />
+          </div>
+        </>
+      );
     } else if (errorTypes) {
       return (
         <ErrorMessage
@@ -203,8 +212,8 @@ const VideoPage: NextPage = () => {
             </>
           )}
           <div className="px-4 lg:w-2/5 lg:px-0">
-            {!sidebarVideos ? (
-              <DataError />
+            {!sidebarVideos || sidebarLoading ? (
+              <LoadingSmallSideColumnVideos count={10} />
             ) : (
               <SmallSingleColumnVideo
                 refetch={refetchSidebarVideos}
